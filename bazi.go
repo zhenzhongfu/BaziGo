@@ -255,6 +255,29 @@ func PrintBazi(bazi *TBazi) {
 	}
 
 	// TODO 十神力量
+	shishenSumFun := func() int {
+		var sum int
+		for _, v := range bazi.XiYong.ShiShenWeight {
+			sum += v
+		}
+		return sum
+	}
+	sum = shishenSumFun()
+	log.Printf("十神力量: 比肩(%.2f%%)劫财(%.2f%%)食神(%.2f%%)伤官(%.2f%%)偏财(%.2f%%)正财(%.2f%%)七杀(%.2f%%)正官(%.2f%%)偏印(%.2f%%)正印(%.2f%%)",
+		float64(bazi.XiYong.ShiShenWeight[0]*100)/float64(sum),
+		float64(bazi.XiYong.ShiShenWeight[1]*100)/float64(sum),
+		float64(bazi.XiYong.ShiShenWeight[2]*100)/float64(sum),
+		float64(bazi.XiYong.ShiShenWeight[3]*100)/float64(sum),
+		float64(bazi.XiYong.ShiShenWeight[4]*100)/float64(sum),
+		float64(bazi.XiYong.ShiShenWeight[5]*100)/float64(sum),
+		float64(bazi.XiYong.ShiShenWeight[6]*100)/float64(sum),
+		float64(bazi.XiYong.ShiShenWeight[7]*100)/float64(sum),
+		float64(bazi.XiYong.ShiShenWeight[8]*100)/float64(sum),
+		float64(bazi.XiYong.ShiShenWeight[9]*100)/float64(sum),
+	)
+
+	// TODO 八字命格
+	// TODO 八字神煞
 
 	// 天干五合
 	log.Println(

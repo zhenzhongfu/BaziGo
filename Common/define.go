@@ -207,11 +207,12 @@ type TSiZhu struct {
 
 // 喜用神
 type TXiYong struct {
-	MonthZhi     int    // 月支
-	DayWuXing    int    // 日干五行
-	Same         int    // 同类
-	Diff         int    // 异类
-	WuXingWeight [5]int // 五行权值
+	MonthZhi      int     // 月支
+	DayWuXing     int     // 日干五行
+	Same          int     // 同类
+	Diff          int     // 异类
+	WuXingWeight  [5]int  // 五行权值
+	ShiShenWeight [10]int // 十神权值
 }
 
 // 大运

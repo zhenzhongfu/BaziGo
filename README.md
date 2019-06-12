@@ -34,3 +34,7 @@ QQ: 32460746
 大运： 癸未 甲申 乙酉 丙戌 丁亥 戊子 己丑 庚寅 辛卯 壬辰
 起运时间 2002 年 5 月 25 日   7 : 7 : 0
 
+
+#### 查表
+http://www.voidcn.com/article/p-ykrkkipa-qk.html
+http://www.131.com.tw/word/b3_2_10.htm
