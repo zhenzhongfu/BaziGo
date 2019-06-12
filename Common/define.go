@@ -16,6 +16,23 @@ type TWuXing struct {
 	Value int // 五行
 }
 
+// 五行统计
+type TWuXingStat struct {
+	Result        [5]int
+	CangGanResult [5]int
+}
+
+// 十二长生
+type TChangSheng struct {
+	Value int
+}
+type TDiShi struct {
+	YearChangSheng  TChangSheng
+	MonthChangSheng TChangSheng
+	DayChangSheng   TChangSheng
+	HourChangSheng  TChangSheng
+}
+
 // {* 五行字符串，以通常的金木水火土为顺序 }
 // 这里没用五行相生或者相克来排列
 var WU_XING_STR = [5]string{
@@ -190,10 +207,11 @@ type TSiZhu struct {
 
 // 喜用神
 type TXiYong struct {
-	MonthZhi  int // 月支
-	DayWuXing int // 日干五行
-	Same      int // 同类
-	Diff      int // 异类
+	MonthZhi     int    // 月支
+	DayWuXing    int    // 日干五行
+	Same         int    // 同类
+	Diff         int    // 异类
+	WuXingWeight [5]int // 五行权值
 }
 
 // 大运
@@ -319,5 +337,36 @@ func GetLunarDayFromNumber(nValue int) string {
 		return LUNAR_DAY_STR[nValue-1]
 	}
 
+	return ""
+}
+
+// 十二长生表，以日干对应四柱查表
+//https://sites.google.com/site/laughing8word/shi-er-zhang-sheng-cha-biao-fa
+var SHI_ER_CHANG_SHENG_STR = [12]string{
+	"长生", "沐浴", "冠带", "临官", "帝旺", "衰", "病", "死", "墓", "绝", "胎", "养"}
+
+var SHI_ER_CHANG_SHENG_LIST = [10][12]int{
+	// 长生 沐浴 冠带 临官 帝旺 衰 病 死 墓 绝 胎 养
+	{11, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, // 甲
+	{6, 5, 4, 3, 2, 1, 0, 11, 10, 9, 8, 7}, // 乙
+	{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1}, // 丙
+	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 10}, // 丁
+	{2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1}, // 戊
+	{9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 10}, // 己
+	{5, 6, 7, 8, 9, 10, 11, 0, 1, 2, 3, 4}, // 庚
+	{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}, // 辛
+	{8, 9, 10, 11, 0, 1, 2, 3, 4, 5, 6, 7}, // 壬
+	{3, 2, 1, 0, 11, 10, 9, 8, 7, 6, 5, 4}, // 癸
+}
+
+func (self *TChangSheng) ToString() string {
+	return GetChangShengFromNumber(self.Value)
+}
+
+// 从数字获得十二长生运名字
+func GetChangShengFromNumber(nValue int) string {
+	if (nValue >= 0) && (nValue < 12) {
+		return SHI_ER_CHANG_SHENG_STR[nValue]
+	}
 	return ""
 }

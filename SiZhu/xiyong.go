@@ -11,8 +11,9 @@ package SiZhu
 // 或四柱刑冲克害用神而能化凶神，制凶神者，就是喜神。 四柱没有用神，就得靠行运流年来补。
 // 对于命局五行较为平衡，用神不太紧缺的四柱，其一生较为平顺，无大起大落。
 import (
-	. "github.com/warrially/BaziGo/Common"
 	"log"
+
+	. "github.com/warrially/BaziGo/Common"
 )
 
 // 天干地支强度测试
@@ -67,50 +68,48 @@ func CalcXiYong(pSiZhu *TSiZhu) TXiYong {
 	wuxing[pSiZhu.DayZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[nMonthZhi][pSiZhu.DayZhu.Gan.Value]
 	wuxing[pSiZhu.HourZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[nMonthZhi][pSiZhu.HourZhu.Gan.Value]
 
-	// log.Println("计算完毕天干后的五行权值是:", wuxing)
+	log.Println("计算完毕天干后的五行权值是:", wuxing)
 
 	// 4. 根据四柱地支, 换算强度
 	for i := 0; i < 3; i++ {
 		// 年
 		var nCangGan = pSiZhu.YearZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			wuxing[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[nMonthZhi][pSiZhu.YearZhu.Zhi.CangGan[i].Value]
+			idx := CalcCangGanQiangDuIndex(pSiZhu.YearZhu.Zhi.Value, pSiZhu.YearZhu.Zhi.CangGan[i].Value)
+			wuxing[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[nMonthZhi-2][pSiZhu.YearZhu.Zhi.Value*3+idx]
 		}
 
 		// 月
 		nCangGan = pSiZhu.MonthZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			wuxing[pSiZhu.MonthZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[nMonthZhi][pSiZhu.MonthZhu.Zhi.CangGan[i].Value]
+			idx := CalcCangGanQiangDuIndex(pSiZhu.MonthZhu.Zhi.Value, pSiZhu.MonthZhu.Zhi.CangGan[i].Value)
+			wuxing[pSiZhu.MonthZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[nMonthZhi-2][pSiZhu.MonthZhu.Zhi.Value*3+idx]
 		}
 
 		// 日
 		nCangGan = pSiZhu.DayZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			wuxing[pSiZhu.DayZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[nMonthZhi][pSiZhu.DayZhu.Zhi.CangGan[i].Value]
+			idx := CalcCangGanQiangDuIndex(pSiZhu.DayZhu.Zhi.Value, pSiZhu.DayZhu.Zhi.CangGan[i].Value)
+			wuxing[pSiZhu.DayZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[nMonthZhi-2][pSiZhu.DayZhu.Zhi.Value*3+idx]
 		}
 
 		// 时
 		nCangGan = pSiZhu.HourZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			wuxing[pSiZhu.HourZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[nMonthZhi][pSiZhu.HourZhu.Zhi.CangGan[i].Value]
+			idx := CalcCangGanQiangDuIndex(pSiZhu.HourZhu.Zhi.Value, pSiZhu.HourZhu.Zhi.CangGan[i].Value)
+			wuxing[pSiZhu.HourZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[nMonthZhi-2][pSiZhu.HourZhu.Zhi.Value*3+idx]
 		}
 	}
-	log.Println("计算完毕天干后的五行权值是:", wuxing)
 
 	// 5. 根据日干五行, 计算出同类和异类
 	var nDayWuXing = pSiZhu.DayZhu.Gan.WuXing.Value
 	xiyong.Same, xiyong.Diff = CalcWuXingQiangRuo(nDayWuXing, wuxing)
-	// log.Println("五行同类", xiyong.Same)
-	// log.Println("五行异类", xiyong.Diff)
-	if xiyong.Same >= xiyong.Diff {
-		log.Printf("身强 %d, %.2f%%\n", xiyong.Same-xiyong.Diff, float64(100*xiyong.Same)/float64(xiyong.Diff+xiyong.Same))
-	} else {
-		log.Printf("身弱 %d, %.2f%%\n", xiyong.Diff-xiyong.Same, float64(100*xiyong.Diff)/float64(xiyong.Diff+xiyong.Same))
-	}
 	// 月支
 	xiyong.MonthZhi = nMonthZhi
 	// 日五行
 	xiyong.DayWuXing = nDayWuXing
+	// 五行权值
+	xiyong.WuXingWeight = wuxing
 
 	return xiyong
 }

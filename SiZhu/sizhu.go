@@ -5,6 +5,48 @@ import (
 	"github.com/warrially/BaziGo/Days"
 )
 
+// TODO 统计五行
+func StatWuXing(pSiZhu *TSiZhu) TWuXingStat {
+	var stat TWuXingStat
+	stat.Result[pSiZhu.YearZhu.Gan.WuXing.Value] += 1
+	stat.Result[pSiZhu.YearZhu.Zhi.WuXing.Value] += 1
+	stat.Result[pSiZhu.MonthZhu.Gan.WuXing.Value] += 1
+	stat.Result[pSiZhu.MonthZhu.Zhi.WuXing.Value] += 1
+	stat.Result[pSiZhu.DayZhu.Gan.WuXing.Value] += 1
+	stat.Result[pSiZhu.DayZhu.Zhi.WuXing.Value] += 1
+	stat.Result[pSiZhu.HourZhu.Gan.WuXing.Value] += 1
+	stat.Result[pSiZhu.HourZhu.Zhi.WuXing.Value] += 1
+
+	// 地支藏干
+	stat.CangGanResult[pSiZhu.YearZhu.Gan.WuXing.Value] += 1
+	stat.CangGanResult[pSiZhu.MonthZhu.Gan.WuXing.Value] += 1
+	stat.CangGanResult[pSiZhu.DayZhu.Gan.WuXing.Value] += 1
+	stat.CangGanResult[pSiZhu.HourZhu.Gan.WuXing.Value] += 1
+	for i := 0; i < 3; i++ {
+		// 年
+		var nCangGan = pSiZhu.YearZhu.Zhi.CangGan[i].Value
+		if nCangGan >= 0 {
+			stat.CangGanResult[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += 1
+		}
+		// 月
+		nCangGan = pSiZhu.MonthZhu.Zhi.CangGan[i].Value
+		if nCangGan >= 0 {
+			stat.CangGanResult[pSiZhu.MonthZhu.Zhi.CangGan[i].WuXing.Value] += 1
+		}
+		// 日
+		nCangGan = pSiZhu.DayZhu.Zhi.CangGan[i].Value
+		if nCangGan >= 0 {
+			stat.CangGanResult[pSiZhu.DayZhu.Zhi.CangGan[i].WuXing.Value] += 1
+		}
+		// 时
+		nCangGan = pSiZhu.HourZhu.Zhi.CangGan[i].Value
+		if nCangGan >= 0 {
+			stat.CangGanResult[pSiZhu.HourZhu.Zhi.CangGan[i].WuXing.Value] += 1
+		}
+	}
+	return stat
+}
+
 // 补充五行
 func CalcWuXing(pZhu *TZhu) TZhu {
 	// 五行
@@ -88,4 +130,14 @@ func GetZhuFromHour(nHour int, nGan int) TZhu {
 	CombineGanZhi2(&zhu.GanZhi, &zhu.Gan, &zhu.Zhi)
 
 	return CalcWuXing(&zhu)
+}
+
+// 计算十二长生地势
+func CalcDiShi(pSiZhu *TSiZhu) TDiShi {
+	var disi TDiShi
+	disi.YearChangSheng.Value = SHI_ER_CHANG_SHENG_LIST[pSiZhu.DayZhu.Gan.Value][pSiZhu.YearZhu.Zhi.Value]
+	disi.MonthChangSheng.Value = SHI_ER_CHANG_SHENG_LIST[pSiZhu.DayZhu.Gan.Value][pSiZhu.MonthZhu.Zhi.Value]
+	disi.DayChangSheng.Value = SHI_ER_CHANG_SHENG_LIST[pSiZhu.DayZhu.Gan.Value][pSiZhu.DayZhu.Zhi.Value]
+	disi.HourChangSheng.Value = SHI_ER_CHANG_SHENG_LIST[pSiZhu.DayZhu.Gan.Value][pSiZhu.HourZhu.Zhi.Value]
+	return disi
 }

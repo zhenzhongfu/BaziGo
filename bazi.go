@@ -1,6 +1,8 @@
 package BaziGo
 
 import (
+	"log"
+
 	. "github.com/warrially/BaziGo/Common"
 	"github.com/warrially/BaziGo/DaYun"
 	"github.com/warrially/BaziGo/Days"
@@ -8,7 +10,6 @@ import (
 	"github.com/warrially/BaziGo/LiChun"
 	"github.com/warrially/BaziGo/Lunar"
 	"github.com/warrially/BaziGo/SiZhu"
-	"log"
 )
 
 // 八字
@@ -22,6 +23,8 @@ type TBazi struct {
 	XiYong      TXiYong     // 喜用神
 	DaYun       TDaYun      // 大运
 	HeHuaChong  THeHuaChong // 合化冲
+	WuXing      TWuXingStat // 五行统计
+	DiShi       TDiShi      // 十二长生地势
 }
 
 // 计算
@@ -60,6 +63,12 @@ func calc(bazi *TBazi, nSex int) {
 
 	// 计算喜用神
 	bazi.XiYong = SiZhu.CalcXiYong(&bazi.SiZhu)
+
+	// 统计五行
+	bazi.WuXing = SiZhu.StatWuXing(&bazi.SiZhu)
+
+	// 计算十二长生
+	bazi.DiShi = SiZhu.CalcDiShi(&bazi.SiZhu)
 }
 
 // 从新历获取八字(年, 月, 日, 时, 分, 秒, 性别男1,女0)
@@ -155,34 +164,98 @@ func PrintBazi(bazi *TBazi) {
 	log.Println(
 		bazi.SiZhu.YearZhu.Zhi.ToString(), "(",
 		bazi.SiZhu.YearZhu.Zhi.WuXing.ToString(), ")",
+		bazi.SiZhu.YearZhu.Zhi.CangGan[0].ToString(),
+		bazi.SiZhu.YearZhu.Zhi.CangGan[0].WuXing.ToString(),
+		bazi.SiZhu.YearZhu.Zhi.CangGan[1].ToString(),
+		bazi.SiZhu.YearZhu.Zhi.CangGan[1].WuXing.ToString(),
+		bazi.SiZhu.YearZhu.Zhi.CangGan[2].ToString(),
+		bazi.SiZhu.YearZhu.Zhi.CangGan[2].WuXing.ToString(), "[",
 		bazi.SiZhu.YearZhu.Zhi.CangGan[0].ShiShen.ToString(),
 		bazi.SiZhu.YearZhu.Zhi.CangGan[1].ShiShen.ToString(),
-		bazi.SiZhu.YearZhu.Zhi.CangGan[2].ShiShen.ToString(),
+		bazi.SiZhu.YearZhu.Zhi.CangGan[2].ShiShen.ToString(), "]",
 		"\t",
 		bazi.SiZhu.MonthZhu.Zhi.ToString(), "(",
 		bazi.SiZhu.MonthZhu.Zhi.WuXing.ToString(), ")",
+		bazi.SiZhu.MonthZhu.Zhi.CangGan[0].ToString(),
+		bazi.SiZhu.MonthZhu.Zhi.CangGan[0].WuXing.ToString(),
+		bazi.SiZhu.MonthZhu.Zhi.CangGan[1].ToString(),
+		bazi.SiZhu.MonthZhu.Zhi.CangGan[1].WuXing.ToString(),
+		bazi.SiZhu.MonthZhu.Zhi.CangGan[2].ToString(),
+		bazi.SiZhu.MonthZhu.Zhi.CangGan[2].WuXing.ToString(), "[",
 		bazi.SiZhu.MonthZhu.Zhi.CangGan[0].ShiShen.ToString(),
 		bazi.SiZhu.MonthZhu.Zhi.CangGan[1].ShiShen.ToString(),
-		bazi.SiZhu.MonthZhu.Zhi.CangGan[2].ShiShen.ToString(),
+		bazi.SiZhu.MonthZhu.Zhi.CangGan[2].ShiShen.ToString(), "]",
 		"\t",
 		bazi.SiZhu.DayZhu.Zhi.ToString(), "(",
 		bazi.SiZhu.DayZhu.Zhi.WuXing.ToString(), ")",
+		bazi.SiZhu.DayZhu.Zhi.CangGan[0].ToString(),
+		bazi.SiZhu.DayZhu.Zhi.CangGan[0].WuXing.ToString(),
+		bazi.SiZhu.DayZhu.Zhi.CangGan[1].ToString(),
+		bazi.SiZhu.DayZhu.Zhi.CangGan[1].WuXing.ToString(),
+		bazi.SiZhu.DayZhu.Zhi.CangGan[2].ToString(),
+		bazi.SiZhu.DayZhu.Zhi.CangGan[2].WuXing.ToString(), "[",
 		bazi.SiZhu.DayZhu.Zhi.CangGan[0].ShiShen.ToString(),
 		bazi.SiZhu.DayZhu.Zhi.CangGan[1].ShiShen.ToString(),
-		bazi.SiZhu.DayZhu.Zhi.CangGan[2].ShiShen.ToString(),
+		bazi.SiZhu.DayZhu.Zhi.CangGan[2].ShiShen.ToString(), "]",
 		"\t",
 		bazi.SiZhu.HourZhu.Zhi.ToString(), "(",
 		bazi.SiZhu.HourZhu.Zhi.WuXing.ToString(), ")",
+		bazi.SiZhu.HourZhu.Zhi.CangGan[0].ToString(),
+		bazi.SiZhu.HourZhu.Zhi.CangGan[0].WuXing.ToString(),
+		bazi.SiZhu.HourZhu.Zhi.CangGan[1].ToString(),
+		bazi.SiZhu.HourZhu.Zhi.CangGan[1].WuXing.ToString(),
+		bazi.SiZhu.HourZhu.Zhi.CangGan[2].ToString(),
+		bazi.SiZhu.HourZhu.Zhi.CangGan[2].WuXing.ToString(), "[",
 		bazi.SiZhu.HourZhu.Zhi.CangGan[0].ShiShen.ToString(),
 		bazi.SiZhu.HourZhu.Zhi.CangGan[1].ShiShen.ToString(),
-		bazi.SiZhu.HourZhu.Zhi.CangGan[2].ShiShen.ToString())
+		bazi.SiZhu.HourZhu.Zhi.CangGan[2].ShiShen.ToString(), "]")
 
+	// 地势
+	log.Println(
+		bazi.DiShi.YearChangSheng.ToString(), "\t\t",
+		bazi.DiShi.MonthChangSheng.ToString(), "\t\t",
+		bazi.DiShi.DayChangSheng.ToString(), "\t\t",
+		bazi.DiShi.HourChangSheng.ToString(), "\t\t",
+	)
+
+	// 纳音
 	log.Println(
 		bazi.SiZhu.YearZhu.GanZhi.NaYin.ToString(), "\t\t",
 		bazi.SiZhu.MonthZhu.GanZhi.NaYin.ToString(), "\t\t",
 		bazi.SiZhu.DayZhu.GanZhi.NaYin.ToString(), "\t\t",
 		bazi.SiZhu.HourZhu.GanZhi.NaYin.ToString(), "\t\t",
 	)
+
+	// TODO 五行数量
+	log.Printf("不计藏干的五行数量: 金(%d)木(%d)水(%d)火(%d)土(%d)", bazi.WuXing.Result[0], bazi.WuXing.Result[1], bazi.WuXing.Result[2], bazi.WuXing.Result[3], bazi.WuXing.Result[4])
+	log.Printf("计入藏干后的五行数量: 金(%d)木(%d)水(%d)火(%d)土(%d)", bazi.WuXing.CangGanResult[0], bazi.WuXing.CangGanResult[1], bazi.WuXing.CangGanResult[2], bazi.WuXing.CangGanResult[3], bazi.WuXing.CangGanResult[4])
+	// TODO 五行力量
+	wuxingSumFun := func() int {
+		var sum int
+		for _, v := range bazi.XiYong.WuXingWeight {
+			sum += v
+		}
+		return sum
+	}
+	sum := wuxingSumFun()
+	log.Printf("五行力量: 金(%.2f%%)木(%.2f%%)水(%.2f%%)火(%.2f%%)土(%.2f%%)",
+		float64(bazi.XiYong.WuXingWeight[0]*100)/float64(sum),
+		float64(bazi.XiYong.WuXingWeight[1]*100)/float64(sum),
+		float64(bazi.XiYong.WuXingWeight[2]*100)/float64(sum),
+		float64(bazi.XiYong.WuXingWeight[3]*100)/float64(sum),
+		float64(bazi.XiYong.WuXingWeight[4]*100)/float64(sum),
+	)
+	// 根据日干五行, 计算出同类和异类
+	log.Println("五行同类", bazi.XiYong.Same)
+	log.Println("五行异类", bazi.XiYong.Diff)
+	if bazi.XiYong.Same >= bazi.XiYong.Diff {
+		log.Printf("身强 %d, %.2f%%\n", bazi.XiYong.Same-bazi.XiYong.Diff, float64(100*bazi.XiYong.Same)/float64(bazi.XiYong.Diff+bazi.XiYong.Same))
+	} else {
+		log.Printf("身弱 %d, %.2f%%\n", bazi.XiYong.Diff-bazi.XiYong.Same, float64(100*bazi.XiYong.Diff)/float64(bazi.XiYong.Diff+bazi.XiYong.Same))
+	}
+
+	// TODO 十神力量
+
 	// 天干五合
 	log.Println(
 		"天干五合：",

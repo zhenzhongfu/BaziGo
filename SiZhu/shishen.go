@@ -91,6 +91,7 @@ func CalcCangGan(nGan int, pCangGan *TGan) {
 		Get5XingFromGan2(&pCangGan.WuXing, nCangGan)
 	} else {
 		pCangGan.ShiShen.Value = -1
+		pCangGan.WuXing.Value = -1
 	}
 }
 
@@ -125,4 +126,14 @@ func CalcShiShen(pSiZhu *TSiZhu) {
 
 	// 转字符串
 	pSiZhu.DayZhu.Gan.ShiShen.Value = -1 // 日主
+}
+
+// 计算藏干在强度表中位置
+func CalcCangGanQiangDuIndex(month, gan int) int {
+	for i, v := range DI_ZHI_CANG_GAN_LIST[month] {
+		if v == gan {
+			return i
+		}
+	}
+	return -1
 }
