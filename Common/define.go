@@ -50,6 +50,66 @@ func (self *TWuXing) ToString() string {
 	return GetWuXingFromNumber(self.Value)
 }
 
+// 获得五行生我关系
+func GetWuXingShengWo(nValue int) int {
+	if nValue == 0 {
+		return 4 // 土生金
+	} else if nValue == 1 {
+		return 2 // 水生木
+	} else if nValue == 2 {
+		return 0 // 金生水
+	} else if nValue == 3 {
+		return 1 // 水生木
+	} else {
+		return 3 // 火生土
+	}
+}
+
+// 获得五行我生关系
+func GetWuXingWoSheng(nValue int) int {
+	if nValue == 0 {
+		return 2 // 金生水
+	} else if nValue == 1 {
+		return 3 // 木生火
+	} else if nValue == 2 {
+		return 1 // 水生木
+	} else if nValue == 3 {
+		return 4 // 火生土
+	} else {
+		return 0 // 土生金
+	}
+}
+
+// 获得五行克我关系
+func GetWuXingKeWo(nValue int) int {
+	if nValue == 0 {
+		return 3 // 火克金
+	} else if nValue == 1 {
+		return 0 // 金克木
+	} else if nValue == 2 {
+		return 4 // 土克水
+	} else if nValue == 3 {
+		return 2 // 水克火
+	} else {
+		return 1 // 木克土
+	}
+}
+
+// 获得五行我克关系
+func GetWuXingWoKe(nValue int) int {
+	if nValue == 0 {
+		return 1 // 金克木
+	} else if nValue == 1 {
+		return 4 // 木克土
+	} else if nValue == 2 {
+		return 3 // 水克火
+	} else if nValue == 3 {
+		return 0 // 火克金
+	} else {
+		return 2 // 土克水
+	}
+}
+
 // 十神属性
 type TShiShen struct {
 	Value int // 十神

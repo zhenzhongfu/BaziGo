@@ -249,9 +249,46 @@ func PrintBazi(bazi *TBazi) {
 	log.Println("五行同类", bazi.XiYong.Same)
 	log.Println("五行异类", bazi.XiYong.Diff)
 	if bazi.XiYong.Same >= bazi.XiYong.Diff {
-		log.Printf("身强 %d, %.2f%%\n", bazi.XiYong.Same-bazi.XiYong.Diff, float64(100*bazi.XiYong.Same)/float64(bazi.XiYong.Diff+bazi.XiYong.Same))
+		log.Printf("身强 %d, 同类强度%.2f%%\n", bazi.XiYong.Same-bazi.XiYong.Diff, float64(100*bazi.XiYong.Same)/float64(bazi.XiYong.Diff+bazi.XiYong.Same))
 	} else {
-		log.Printf("身弱 %d, %.2f%%\n", bazi.XiYong.Diff-bazi.XiYong.Same, float64(100*bazi.XiYong.Diff)/float64(bazi.XiYong.Diff+bazi.XiYong.Same))
+		log.Printf("身弱 %d, 同类强度%.2f%%\n", bazi.XiYong.Diff-bazi.XiYong.Same, float64(100*bazi.XiYong.Same)/float64(bazi.XiYong.Diff+bazi.XiYong.Same))
+	}
+	// TODO 判断旺缺,<7太弱;<=16中;>17太旺
+	weight := bazi.XiYong.WuXingWeight[bazi.SiZhu.DayZhu.Gan.WuXing.Value]
+	if weight <= 7 {
+		log.Printf("日元太弱, 喜%s、%s, 忌%s、%s",
+			bazi.SiZhu.DayZhu.Gan.WuXing.ToString(),
+			GetWuXingFromNumber(GetWuXingShengWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			//GetWuXingFromNumber(GetWuXingWoSheng(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			GetWuXingFromNumber(GetWuXingWoKe(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			GetWuXingFromNumber(GetWuXingKeWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+		)
+	} else if 7 < weight && weight <= 10 {
+		log.Printf("日元偏弱, 喜%s、%s, 忌%s、%s",
+			bazi.SiZhu.DayZhu.Gan.WuXing.ToString(),
+			GetWuXingFromNumber(GetWuXingShengWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			//GetWuXingFromNumber(GetWuXingWoSheng(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			GetWuXingFromNumber(GetWuXingWoKe(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			GetWuXingFromNumber(GetWuXingKeWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+		)
+	} else if 10 < weight && weight < 15 {
+		log.Printf("日元中和")
+	} else if 15 <= weight && weight <= 17 {
+		log.Printf("日元偏旺, 喜%s、%s, 忌%s、%s",
+			//GetWuXingFromNumber(GetWuXingWoSheng(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			GetWuXingFromNumber(GetWuXingWoKe(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			GetWuXingFromNumber(GetWuXingKeWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			bazi.SiZhu.DayZhu.Gan.WuXing.ToString(),
+			GetWuXingFromNumber(GetWuXingShengWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+		)
+	} else { // >17
+		log.Printf("日元太旺, 喜%s、%s, 忌%s、%s",
+			//GetWuXingFromNumber(GetWuXingWoSheng(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			GetWuXingFromNumber(GetWuXingWoKe(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			GetWuXingFromNumber(GetWuXingKeWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+			bazi.SiZhu.DayZhu.Gan.WuXing.ToString(),
+			GetWuXingFromNumber(GetWuXingShengWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)),
+		)
 	}
 
 	// TODO 十神力量
@@ -278,6 +315,7 @@ func PrintBazi(bazi *TBazi) {
 
 	// TODO 八字命格
 	// TODO 八字神煞
+	// TODO 安命宫 http://www.131.com.tw/word/b3_2_7.htm
 
 	// 天干五合
 	log.Println(
