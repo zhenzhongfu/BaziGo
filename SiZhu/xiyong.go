@@ -17,6 +17,10 @@ import (
 )
 
 // 天干地支强度测试
+// 三种算法
+// 1) 天干地支算10分，藏干算1分, 这里采用这种算法，http://freehoro.net/BaZi/NatalXiJi/NatalXiJi.php?NUrl=&CNT=1920&User=TSwxOTg0LTEwLTA5IDE1OjU0OjAwLDgsMCw4LDAsMixOLE4sMCwx&SG1=MSwxLDEsMTEsMywxLDMsOQ&JQ1=MTk4NC0xMC0wOCAxMDo0MTo1NiwxOTU&JQ2=MTk4NC0xMS0wNyAxMzo0NTozOSwyMjU
+// 2) 按表1
+// 3) 按表2
 
 // fix 天干强度表，原表似乎结果不准确, 按照http://www.131.com.tw/word/b3_2_14.htm的算法修正
 var TIAN_GAN_QIANG_DU_LIST = [10]int{5, 5, 5, 5, 5, 5, 5, 5, 5, 5} // 甲乙丙丁戊己庚辛壬癸
@@ -71,52 +75,86 @@ func CalcXiYong(pSiZhu *TSiZhu) TXiYong {
 
 	// 3. 根据四柱天干, 换算强度
 	//wuxing[pSiZhu.YearZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[nMonthZhi][pSiZhu.YearZhu.Gan.Value]
-	wuxing[pSiZhu.YearZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.YearZhu.Gan.Value]
-	wuxing[pSiZhu.MonthZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.MonthZhu.Gan.Value]
-	wuxing[pSiZhu.DayZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.DayZhu.Gan.Value]
-	wuxing[pSiZhu.HourZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.HourZhu.Gan.Value]
-	// 3.1 根据天干，换算十神强度
-	shishen[pSiZhu.YearZhu.Gan.ShiShen.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.YearZhu.Gan.Value]
-	shishen[pSiZhu.MonthZhu.Gan.ShiShen.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.MonthZhu.Gan.Value]
-	//shishen[pSiZhu.DayZhu.Gan.ShiShen.Value] += TIAN_GAN_QIANG_DU_LIST[nMonthZhi][pSiZhu.DayZhu.Gan.Value]
-	shishen[GetShiShenFromGan(pSiZhu.DayZhu.Gan.Value, pSiZhu.DayZhu.Gan.Value)] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.DayZhu.Gan.Value]
-	shishen[pSiZhu.HourZhu.Gan.ShiShen.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.HourZhu.Gan.Value]
+	/*
+		wuxing[pSiZhu.YearZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.YearZhu.Gan.Value]
+		wuxing[pSiZhu.MonthZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.MonthZhu.Gan.Value]
+		wuxing[pSiZhu.DayZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.DayZhu.Gan.Value]
+		wuxing[pSiZhu.HourZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.HourZhu.Gan.Value]
+		// 3.1 根据天干，换算十神强度
+		shishen[pSiZhu.YearZhu.Gan.ShiShen.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.YearZhu.Gan.Value]
+		shishen[pSiZhu.MonthZhu.Gan.ShiShen.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.MonthZhu.Gan.Value]
+		shishen[GetShiShenFromGan(pSiZhu.DayZhu.Gan.Value, pSiZhu.DayZhu.Gan.Value)] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.DayZhu.Gan.Value]
+		shishen[pSiZhu.HourZhu.Gan.ShiShen.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.HourZhu.Gan.Value]
+
+		log.Println("计算完毕天干后的五行权值是:", wuxing)
+	*/
+	// 3. 根据四柱天干, 换算强度
+	wuxing[pSiZhu.YearZhu.Gan.WuXing.Value] += 10
+	wuxing[pSiZhu.MonthZhu.Gan.WuXing.Value] += 10
+	wuxing[pSiZhu.DayZhu.Gan.WuXing.Value] += 10
+	wuxing[pSiZhu.HourZhu.Gan.WuXing.Value] += 10
+
+	shishen[pSiZhu.YearZhu.Gan.ShiShen.Value] += 10
+	shishen[pSiZhu.MonthZhu.Gan.ShiShen.Value] += 10
+	shishen[GetShiShenFromGan(pSiZhu.DayZhu.Gan.Value, pSiZhu.DayZhu.Gan.Value)] += 10
+	shishen[pSiZhu.HourZhu.Gan.ShiShen.Value] += 10
 
 	log.Println("计算完毕天干后的五行权值是:", wuxing)
 
 	// 4. 根据四柱地支, 换算强度, 计算五行权值，以及十神权值
+	wuxing[pSiZhu.YearZhu.Zhi.WuXing.Value] += 10
+	wuxing[pSiZhu.MonthZhu.Zhi.WuXing.Value] += 10
+	wuxing[pSiZhu.DayZhu.Zhi.WuXing.Value] += 10
+	wuxing[pSiZhu.HourZhu.Zhi.WuXing.Value] += 10
+
 	for i := 0; i < 3; i++ {
 		// 年
 		var nCangGan = pSiZhu.YearZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			idx := CalcCangGanQiangDuIndex(pSiZhu.YearZhu.Zhi.Value, pSiZhu.YearZhu.Zhi.CangGan[i].Value)
-			//wuxing[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[nMonthZhi-2][pSiZhu.YearZhu.Zhi.Value*3+idx]
-			wuxing[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.YearZhu.Zhi.Value*3+idx]
-			shishen[pSiZhu.YearZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.YearZhu.Zhi.Value*3+idx]
+			/*
+				idx := CalcCangGanQiangDuIndex(pSiZhu.YearZhu.Zhi.Value, pSiZhu.YearZhu.Zhi.CangGan[i].Value)
+				//wuxing[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[nMonthZhi-2][pSiZhu.YearZhu.Zhi.Value*3+idx]
+				wuxing[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.YearZhu.Zhi.Value*3+idx]
+				shishen[pSiZhu.YearZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.YearZhu.Zhi.Value*3+idx]
+			*/
+			wuxing[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += 1
+			shishen[pSiZhu.YearZhu.Zhi.CangGan[i].ShiShen.Value] += 1
 		}
 
 		// 月
 		nCangGan = pSiZhu.MonthZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			idx := CalcCangGanQiangDuIndex(pSiZhu.MonthZhu.Zhi.Value, pSiZhu.MonthZhu.Zhi.CangGan[i].Value)
-			wuxing[pSiZhu.MonthZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.MonthZhu.Zhi.Value*3+idx] * 2 // 月支能量*2
-			shishen[pSiZhu.MonthZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.MonthZhu.Zhi.Value*3+idx] * 2
+			/*
+				idx := CalcCangGanQiangDuIndex(pSiZhu.MonthZhu.Zhi.Value, pSiZhu.MonthZhu.Zhi.CangGan[i].Value)
+				wuxing[pSiZhu.MonthZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.MonthZhu.Zhi.Value*3+idx] * 2 // 月支能量*2
+				shishen[pSiZhu.MonthZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.MonthZhu.Zhi.Value*3+idx] * 2
+			*/
+			wuxing[pSiZhu.MonthZhu.Zhi.CangGan[i].WuXing.Value] += 1
+			shishen[pSiZhu.MonthZhu.Zhi.CangGan[i].ShiShen.Value] += 1
 		}
 
 		// 日
 		nCangGan = pSiZhu.DayZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			idx := CalcCangGanQiangDuIndex(pSiZhu.DayZhu.Zhi.Value, pSiZhu.DayZhu.Zhi.CangGan[i].Value)
-			wuxing[pSiZhu.DayZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.DayZhu.Zhi.Value*3+idx]
-			shishen[pSiZhu.DayZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.DayZhu.Zhi.Value*3+idx]
+			/*
+				idx := CalcCangGanQiangDuIndex(pSiZhu.DayZhu.Zhi.Value, pSiZhu.DayZhu.Zhi.CangGan[i].Value)
+				wuxing[pSiZhu.DayZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.DayZhu.Zhi.Value*3+idx]
+				shishen[pSiZhu.DayZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.DayZhu.Zhi.Value*3+idx]
+			*/
+			wuxing[pSiZhu.DayZhu.Zhi.CangGan[i].WuXing.Value] += 1
+			shishen[pSiZhu.DayZhu.Zhi.CangGan[i].ShiShen.Value] += 1
 		}
 
 		// 时
 		nCangGan = pSiZhu.HourZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			idx := CalcCangGanQiangDuIndex(pSiZhu.HourZhu.Zhi.Value, pSiZhu.HourZhu.Zhi.CangGan[i].Value)
-			wuxing[pSiZhu.HourZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.HourZhu.Zhi.Value*3+idx]
-			shishen[pSiZhu.HourZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.HourZhu.Zhi.Value*3+idx]
+			/*
+				idx := CalcCangGanQiangDuIndex(pSiZhu.HourZhu.Zhi.Value, pSiZhu.HourZhu.Zhi.CangGan[i].Value)
+				wuxing[pSiZhu.HourZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.HourZhu.Zhi.Value*3+idx]
+				shishen[pSiZhu.HourZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.HourZhu.Zhi.Value*3+idx]
+			*/
+			wuxing[pSiZhu.HourZhu.Zhi.CangGan[i].WuXing.Value] += 1
+			shishen[pSiZhu.HourZhu.Zhi.CangGan[i].ShiShen.Value] += 1
 		}
 	}
 

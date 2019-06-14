@@ -131,6 +131,79 @@ func (self *TShiShen) ToString() string {
 	return GetShiShenFromNumber(self.Value)
 }
 
+func GetShiShenFromDayZhuValue(nValue, nDayZhuValue int) string {
+	if (nValue >= 0) && (nValue < 5) {
+		switch nValue {
+		case 0: // 金
+			switch nDayZhuValue {
+			case 0: // 金
+				return GetShiShenFromNumber(0) + GetShiShenFromNumber(1) // 同类:比劫
+			case 1: // 木
+				return GetShiShenFromNumber(6) + GetShiShenFromNumber(7) // 克我:正官七杀
+			case 2: // 水
+				return GetShiShenFromNumber(8) + GetShiShenFromNumber(9) // 生我:正偏印
+			case 3: // 火
+				return GetShiShenFromNumber(4) + GetShiShenFromNumber(5) // 我克:正偏财
+			case 4: // 土
+				return GetShiShenFromNumber(2) + GetShiShenFromNumber(3) // 我生:食伤
+			}
+		case 1: // 木
+			switch nDayZhuValue {
+			case 0: // 金
+				return GetShiShenFromNumber(4) + GetShiShenFromNumber(5) // 我克:正偏财
+			case 1: // 木
+				return GetShiShenFromNumber(0) + GetShiShenFromNumber(1) // 同类:比劫
+			case 2: // 水
+				return GetShiShenFromNumber(2) + GetShiShenFromNumber(3) // 我生:食伤
+			case 3: // 火
+				return GetShiShenFromNumber(8) + GetShiShenFromNumber(9) // 生我:正偏印
+			case 4: // 土
+				return GetShiShenFromNumber(6) + GetShiShenFromNumber(7) // 克我:正官七杀
+			}
+		case 2: // 水
+			switch nDayZhuValue {
+			case 0: // 金
+				return GetShiShenFromNumber(2) + GetShiShenFromNumber(3) // 我生:食伤
+			case 1: // 木
+				return GetShiShenFromNumber(8) + GetShiShenFromNumber(9) // 生我:正偏印
+			case 2: // 水
+				return GetShiShenFromNumber(0) + GetShiShenFromNumber(1) // 同类:比劫
+			case 3: // 火
+				return GetShiShenFromNumber(6) + GetShiShenFromNumber(7) // 克我:正官七杀
+			case 4: // 土
+				return GetShiShenFromNumber(4) + GetShiShenFromNumber(5) // 我克:正偏财
+			}
+		case 3: // 火
+			switch nDayZhuValue {
+			case 0: // 金
+				return GetShiShenFromNumber(6) + GetShiShenFromNumber(7) // 克我:正官七杀
+			case 1: // 木
+				return GetShiShenFromNumber(2) + GetShiShenFromNumber(3) // 我生:食伤
+			case 2: // 水
+				return GetShiShenFromNumber(4) + GetShiShenFromNumber(5) // 我克:正偏财
+			case 3: // 火
+				return GetShiShenFromNumber(0) + GetShiShenFromNumber(1) // 同类:比劫
+			case 4: // 土
+				return GetShiShenFromNumber(8) + GetShiShenFromNumber(9) // 生我:正偏印
+			}
+		case 4: // 土
+			switch nDayZhuValue {
+			case 0: // 金
+				return GetShiShenFromNumber(8) + GetShiShenFromNumber(9) // 生我:正偏印
+			case 1: // 木
+				return GetShiShenFromNumber(4) + GetShiShenFromNumber(5) // 我克:正偏财
+			case 2: // 水
+				return GetShiShenFromNumber(6) + GetShiShenFromNumber(7) // 克我:正官七杀
+			case 3: // 火
+				return GetShiShenFromNumber(2) + GetShiShenFromNumber(3) // 我生:食伤
+			case 4: // 土
+				return GetShiShenFromNumber(0) + GetShiShenFromNumber(1) // 同类:比劫
+			}
+		}
+	}
+	return ""
+}
+
 // 纳音
 type TNaYin struct {
 	Value int // 纳音五行
