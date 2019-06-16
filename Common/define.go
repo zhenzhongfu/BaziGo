@@ -348,6 +348,14 @@ type TXiYong struct {
 	ShiShenWeight [10]int // 十神权值
 }
 
+// 神煞
+type TShenSha struct {
+	YearShenSha  []string
+	MonthShenSha []string
+	DayShenSha   []string
+	HourShenSha  []string
+}
+
 // 大运
 type TDaYun struct {
 	Zhu    [12]TZhu // 柱
