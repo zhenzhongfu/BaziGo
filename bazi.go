@@ -26,6 +26,7 @@ type TBazi struct {
 	HeHuaChong  THeHuaChong // 合化冲
 	WuXing      TWuXingStat // 五行统计
 	DiShi       TDiShi      // 十二长生地势
+	ShenSha     TShenSha    // 神煞
 }
 
 // 计算
@@ -70,6 +71,9 @@ func calc(bazi *TBazi, nSex int) {
 
 	// 计算十二长生
 	bazi.DiShi = SiZhu.CalcDiShi(&bazi.SiZhu)
+
+	// 神煞
+	bazi.ShenSha = SiZhu.CalcShenSha(&bazi.SiZhu)
 }
 
 // 从新历获取八字(年, 月, 日, 时, 分, 秒, 性别男1,女0)
@@ -317,7 +321,22 @@ func PrintBazi(bazi *TBazi) {
 	)
 
 	// TODO 八字命格
+
 	// TODO 八字神煞
+	//log.Println(bazi.ShenSha)
+	for _, v := range bazi.ShenSha.YearShenSha {
+		log.Printf("年柱神煞: %s : %s", v, SiZhu.SHEN_SHA_MEANING_MAP[v])
+	}
+	for _, v := range bazi.ShenSha.MonthShenSha {
+		log.Printf("月柱神煞: %s : %s", v, SiZhu.SHEN_SHA_MEANING_MAP[v])
+	}
+	for _, v := range bazi.ShenSha.DayShenSha {
+		log.Printf("日柱神煞: %s : %s", v, SiZhu.SHEN_SHA_MEANING_MAP[v])
+	}
+	for _, v := range bazi.ShenSha.HourShenSha {
+		log.Printf("时柱神煞: %s : %s", v, SiZhu.SHEN_SHA_MEANING_MAP[v])
+	}
+
 	// TODO 安命宫 http://www.131.com.tw/word/b3_2_7.htm
 
 	// 天干五合
