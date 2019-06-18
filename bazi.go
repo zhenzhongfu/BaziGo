@@ -3,6 +3,7 @@ package BaziGo
 import (
 	"log"
 	"math"
+	"sort"
 
 	. "github.com/warrially/BaziGo/Common"
 	"github.com/warrially/BaziGo/DaYun"
@@ -261,36 +262,59 @@ func PrintBazi(bazi *TBazi) {
 	// TODO 判断旺缺,<7太弱;<=16中;>17太旺
 	weight := bazi.XiYong.WuXingWeight[bazi.SiZhu.DayZhu.Gan.WuXing.Value]
 	shengwo := GetWuXingShengWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)
-	//wosheng := GetWuXingWoSheng(bazi.SiZhu.DayZhu.Gan.WuXing.Value)
+	wosheng := GetWuXingWoSheng(bazi.SiZhu.DayZhu.Gan.WuXing.Value)
 	woke := GetWuXingWoKe(bazi.SiZhu.DayZhu.Gan.WuXing.Value)
 	kewo := GetWuXingKeWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)
+
+	type w struct {
+		nWuxingValue int
+		nWeight      int
+	}
+	var l = []w{
+		{wosheng, bazi.XiYong.WuXingWeight[wosheng]},
+		{woke, bazi.XiYong.WuXingWeight[woke]},
+		{kewo, bazi.XiYong.WuXingWeight[kewo]},
+	}
+	sort.Slice(l, func(i, j int) bool {
+		return l[i].nWeight > l[j].nWeight
+	})
+
 	if weight <= 7 || (bazi.XiYong.Diff-bazi.XiYong.Same >= 10 && bazi.XiYong.Diff-bazi.XiYong.Same > 0) {
 		log.Printf("日元太弱, 喜%s、%s(%s、%s), 忌%s、%s(%s、%s)",
 			bazi.SiZhu.DayZhu.Gan.WuXing.ToString(), GetWuXingFromNumber(shengwo),
 			"比劫", GetShiShenFromDayZhuValue(shengwo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
-			GetWuXingFromNumber(woke), GetWuXingFromNumber(kewo),
-			GetShiShenFromDayZhuValue(woke, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(kewo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
+			//GetWuXingFromNumber(woke), GetWuXingFromNumber(kewo),
+			//GetShiShenFromDayZhuValue(woke, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(kewo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
+
+			GetWuXingFromNumber(l[0].nWuxingValue), GetWuXingFromNumber(l[1].nWuxingValue),
+			GetShiShenFromDayZhuValue(l[0].nWuxingValue, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(l[1].nWuxingValue, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
 		)
 	} else if 7 < weight && weight <= 10 || (bazi.XiYong.Diff-bazi.XiYong.Same < 10 && bazi.XiYong.Diff-bazi.XiYong.Same >= 5) {
 		log.Printf("日元偏弱, 喜%s、%s(%s、%s), 忌%s、%s(%s、%s)",
 			bazi.SiZhu.DayZhu.Gan.WuXing.ToString(), GetWuXingFromNumber(shengwo),
 			"比劫", GetShiShenFromDayZhuValue(shengwo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
-			GetWuXingFromNumber(woke), GetWuXingFromNumber(kewo),
-			GetShiShenFromDayZhuValue(woke, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(kewo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
+			//			GetWuXingFromNumber(woke), GetWuXingFromNumber(kewo),
+			//			GetShiShenFromDayZhuValue(woke, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(kewo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
+			GetWuXingFromNumber(l[0].nWuxingValue), GetWuXingFromNumber(l[1].nWuxingValue),
+			GetShiShenFromDayZhuValue(l[0].nWuxingValue, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(l[1].nWuxingValue, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
 		)
 	} else if 10 < weight && weight < 15 && math.Abs(float64(bazi.XiYong.Same-bazi.XiYong.Diff)) < 5 {
 		log.Printf("日元中和")
 	} else if 15 <= weight && weight <= 17 && bazi.XiYong.Same >= bazi.XiYong.Diff {
 		log.Printf("日元偏旺, 喜%s、%s(%s、%s), 忌%s、%s(%s、%s)",
-			GetWuXingFromNumber(woke), GetWuXingFromNumber(kewo),
-			GetShiShenFromDayZhuValue(woke, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(kewo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
+			//GetWuXingFromNumber(woke), GetWuXingFromNumber(kewo),
+			//GetShiShenFromDayZhuValue(woke, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(kewo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
+			GetWuXingFromNumber(l[0].nWuxingValue), GetWuXingFromNumber(l[1].nWuxingValue),
+			GetShiShenFromDayZhuValue(l[0].nWuxingValue, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(l[1].nWuxingValue, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
 			bazi.SiZhu.DayZhu.Gan.WuXing.ToString(), GetWuXingFromNumber(shengwo),
 			"比劫", GetShiShenFromDayZhuValue(shengwo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
 		)
-	} else if 17 < weight && bazi.XiYong.Same >= bazi.XiYong.Diff { // >17
+	} else if 17 < weight || (bazi.XiYong.Same-bazi.XiYong.Diff >= 10) { // >17
 		log.Printf("日元太旺, 喜%s、%s(%s、%s), 忌%s、%s(%s、%s)",
-			GetWuXingFromNumber(woke), GetWuXingFromNumber(kewo),
-			GetShiShenFromDayZhuValue(woke, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(kewo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
+			//GetWuXingFromNumber(woke), GetWuXingFromNumber(kewo),
+			//GetShiShenFromDayZhuValue(woke, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(kewo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
+			GetWuXingFromNumber(l[0].nWuxingValue), GetWuXingFromNumber(l[1].nWuxingValue),
+			GetShiShenFromDayZhuValue(l[0].nWuxingValue, bazi.SiZhu.DayZhu.Gan.WuXing.Value), GetShiShenFromDayZhuValue(l[1].nWuxingValue, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
 			bazi.SiZhu.DayZhu.Gan.WuXing.ToString(), GetWuXingFromNumber(shengwo),
 			"比劫", GetShiShenFromDayZhuValue(shengwo, bazi.SiZhu.DayZhu.Gan.WuXing.Value),
 		)
