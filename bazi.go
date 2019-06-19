@@ -259,6 +259,7 @@ func PrintBazi(bazi *TBazi) {
 	} else {
 		log.Printf("身弱 %d, 同类强度%.2f%%\n", bazi.XiYong.Diff-bazi.XiYong.Same, float64(100*bazi.XiYong.Same)/float64(bazi.XiYong.Diff+bazi.XiYong.Same))
 	}
+
 	// TODO 判断旺缺,<7太弱;<=16中;>17太旺
 	weight := bazi.XiYong.WuXingWeight[bazi.SiZhu.DayZhu.Gan.WuXing.Value]
 	shengwo := GetWuXingShengWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)
