@@ -1,9 +1,11 @@
 package BaziGo
 
 import (
+	"fmt"
 	"log"
 	"math"
 	"sort"
+	"strconv"
 
 	. "github.com/warrially/BaziGo/Common"
 	"github.com/warrially/BaziGo/DaYun"
@@ -428,5 +430,48 @@ func PrintBazi(bazi *TBazi) {
 		bazi.DaYun.QiYun.Hour, ":",
 		bazi.DaYun.QiYun.Minute, ":",
 		bazi.DaYun.QiYun.Second)
+
+	// 穷通宝鉴调候用神参考,只看天干，查表
+	log.Println("穷通宝鉴调候用神参考：", SiZhu.QTBJ_STR[bazi.SiZhu.DayZhu.Gan.ToString()+bazi.SiZhu.DayZhu.Zhi.ToString()])
+	// 三命通会,只看天干，查表
+	for i, v := range SiZhu.SMTH_STR {
+		if v == bazi.SiZhu.DayZhu.Gan.ToString()+bazi.SiZhu.DayZhu.Zhi.ToString() {
+			log.Println("三命通会论：", SiZhu.SMTH_STR[i], SiZhu.SMTH_LIST[i])
+		}
+
+	}
+	// 一生运势，看出生月，日，时
+	log.Println("月", SiZhu.YSYS_MONTH_STR[GetLunarMonthFromNumber(bazi.LunarDate.Month)],
+		"日", SiZhu.YSYS_DAY_STR[GetLunarDayFromNumber(bazi.LunarDate.Day)],
+		"时", SiZhu.YSYS_HOUR_STR[bazi.SiZhu.HourZhu.Zhi.ToString()])
+
+	// 三世财运,看农历出生年和出生月，查表
+	sc := SiZhu.SSCY_LIST[bazi.LunarDate.Year%10][bazi.LunarDate.Month-1]
+	log.Println(sc, SiZhu.SSCY_STR[sc])
+
+	// 前世今生，测上辈子是什么人, 阳历，1+9+8+1+0+3+1+0=23，2+3=5
+	addDigits := func(num int) int {
+		for num > 9 {
+			str := fmt.Sprintf("%d", num)
+			num = 0
+			for _, i := range str {
+				j, _ := strconv.Atoi(string(i))
+				num += j
+			}
+		}
+		return num
+	}
+	log.Println("前世:", SiZhu.QSJS_STR[addDigits(bazi.SolarDate.Year+bazi.SolarDate.Month+bazi.SolarDate.Day)-1])
+
+	// TODO 手机测吉凶
+	/*
+	   1、先将手机号码最后四位抽出，作为测字基数。
+	   2、除以80，减去所有整数位(若结果为0，则吉凶数字为80，省略下一步)
+	   3、再将所得出的小数位乘以80，就得出一个吉凶数字。
+	   4、查询手机号码吉凶预测表《八十一数吉凶佩带琥珀守护神八卦吉祥笔画划表》对照结果。
+	*/
+
+	// 属相运势
+
 	log.Println("======================================================================")
 }
