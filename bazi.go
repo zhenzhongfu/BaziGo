@@ -440,6 +440,12 @@ func PrintBazi(bazi *TBazi) {
 		}
 
 	}
+	for i, v := range SiZhu.SMTH_DAY_HOUR_STR {
+		if v == bazi.SiZhu.DayZhu.Gan.ToString()+bazi.SiZhu.DayZhu.Zhi.ToString()+bazi.SiZhu.HourZhu.Gan.ToString()+bazi.SiZhu.HourZhu.Zhi.ToString() {
+			log.Println("", SiZhu.SMTH_DAY_HOUR_LIST1[i], SiZhu.SMTH_DAY_HOUR_LIST2[i])
+		}
+	}
+
 	// 一生运势，看出生月，日，时
 	log.Println("月", SiZhu.YSYS_MONTH_STR[GetLunarMonthFromNumber(bazi.LunarDate.Month)],
 		"日", SiZhu.YSYS_DAY_STR[GetLunarDayFromNumber(bazi.LunarDate.Day)],
@@ -472,6 +478,11 @@ func PrintBazi(bazi *TBazi) {
 	*/
 
 	// 属相运势
+
+	// 四季用神
+	season := int(math.Ceil(float64(bazi.LunarDate.Month)/3)) - 1
+	log.Println(season)
+	log.Println(SiZhu.SJYS_STR[season][bazi.SiZhu.DayZhu.Gan.WuXing.Value])
 
 	log.Println("======================================================================")
 }
