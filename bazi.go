@@ -262,6 +262,10 @@ func PrintBazi(bazi *TBazi) {
 		log.Printf("身弱 %d, 同类强度%.2f%%\n", bazi.XiYong.Diff-bazi.XiYong.Same, float64(100*bazi.XiYong.Same)/float64(bazi.XiYong.Diff+bazi.XiYong.Same))
 	}
 
+	jijie := int(math.Ceil(float64(bazi.LunarDate.Month)/3)) - 1
+	log.Println("四季五行:", SI_JI_XI_JI_STR[bazi.SiZhu.DayZhu.Gan.WuXing.Value][jijie])
+	log.Println("五行制化:", WU_XING_ZHIHUA_STR[bazi.SiZhu.DayZhu.Gan.WuXing.Value])
+
 	// TODO 判断旺缺,<7太弱;<=16中;>17太旺
 	weight := bazi.XiYong.WuXingWeight[bazi.SiZhu.DayZhu.Gan.WuXing.Value]
 	shengwo := GetWuXingShengWo(bazi.SiZhu.DayZhu.Gan.WuXing.Value)
@@ -440,6 +444,12 @@ func PrintBazi(bazi *TBazi) {
 		}
 
 	}
+	for i, v := range SiZhu.SMTH_DAY_HOUR_STR {
+		if v == bazi.SiZhu.DayZhu.Gan.ToString()+bazi.SiZhu.DayZhu.Zhi.ToString()+bazi.SiZhu.HourZhu.Gan.ToString()+bazi.SiZhu.HourZhu.Zhi.ToString() {
+			log.Println("", SiZhu.SMTH_DAY_HOUR_LIST1[i], SiZhu.SMTH_DAY_HOUR_LIST2[i])
+		}
+	}
+
 	// 一生运势，看出生月，日，时
 	log.Println("月", SiZhu.YSYS_MONTH_STR[GetLunarMonthFromNumber(bazi.LunarDate.Month)],
 		"日", SiZhu.YSYS_DAY_STR[GetLunarDayFromNumber(bazi.LunarDate.Day)],
@@ -471,7 +481,11 @@ func PrintBazi(bazi *TBazi) {
 	   4、查询手机号码吉凶预测表《八十一数吉凶佩带琥珀守护神八卦吉祥笔画划表》对照结果。
 	*/
 
-	// 属相运势
+	// TODO 属相运势
+
+	// 袁天罡称骨
+	log.Println("00---- ", bazi.LunarDate.Year, bazi.LunarDate.Month, bazi.LunarDate.Day, bazi.LunarDate.Hour)
+	log.Println("11---- ", SiZhu.CHENG_GU_YEAR_WEIGHT_STR[bazi.LunarDate.Year], SiZhu.CHENG_GU_MONTH_WEIGHT_STR[GetLunarMonthFromNumber(bazi.LunarDate.Month)], SiZhu.CHENG_GU_DAY_WEIGHT_STR[GetLunarDayFromNumber(bazi.LunarDate.Day)], SiZhu.CHENG_GU_HOUR_WEIGHT_STR[bazi.LunarDate.Hour])
 
 	log.Println("======================================================================")
 }
