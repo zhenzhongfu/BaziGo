@@ -487,5 +487,10 @@ func PrintBazi(bazi *TBazi) {
 	log.Println("00---- ", bazi.LunarDate.Year, bazi.LunarDate.Month, bazi.LunarDate.Day, bazi.LunarDate.Hour)
 	log.Println("11---- ", SiZhu.CHENG_GU_YEAR_WEIGHT_STR[bazi.LunarDate.Year], SiZhu.CHENG_GU_MONTH_WEIGHT_STR[GetLunarMonthFromNumber(bazi.LunarDate.Month)], SiZhu.CHENG_GU_DAY_WEIGHT_STR[GetLunarDayFromNumber(bazi.LunarDate.Day)], SiZhu.CHENG_GU_HOUR_WEIGHT_STR[bazi.LunarDate.Hour])
 
+	// 四季用神
+	season := int(math.Ceil(float64(bazi.LunarDate.Month)/3)) - 1
+	log.Println(season)
+	log.Println(SiZhu.SJYS_STR[season][bazi.SiZhu.DayZhu.Gan.WuXing.Value])
+
 	log.Println("======================================================================")
 }
