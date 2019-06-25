@@ -440,7 +440,15 @@ func PrintBazi(bazi *TBazi) {
 	// 三命通会,只看天干，查表
 	for i, v := range SiZhu.SMTH_STR {
 		if v == bazi.SiZhu.DayZhu.Gan.ToString()+bazi.SiZhu.DayZhu.Zhi.ToString() {
-			log.Println("三命通会论：", SiZhu.SMTH_STR[i], SiZhu.SMTH_LIST[i])
+			log.Println("三命通会论：", SiZhu.SMTH_STR[i],
+				SiZhu.SMTH_RGXX_LIST[i],
+				SiZhu.SMTH_RGCC_LIST[i],
+				SiZhu.SMTH_RGZFX_LIST[i],
+				SiZhu.SMTH_XGFX_LIST[i],
+				SiZhu.SMTH_AQFX_LIST[i],
+				SiZhu.SMTH_SYFX_LIST[i],
+				SiZhu.SMTH_CYFX_LIST[i],
+				SiZhu.SMTH_JKFX_LIST[i])
 		}
 
 	}
