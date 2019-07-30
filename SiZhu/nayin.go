@@ -4,7 +4,6 @@ import (
 	. "github.com/warrially/BaziGo/Common"
 )
 
-// 计算十神
 func CalcNaYin(pSiZhu *TSiZhu) {
 	// 从干支转纳音
 	GetNaYinFromGanZhi2(&pSiZhu.YearZhu.GanZhi)

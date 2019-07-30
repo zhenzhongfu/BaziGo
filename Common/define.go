@@ -33,6 +33,12 @@ type TDiShi struct {
 	HourChangSheng  TChangSheng
 }
 
+// 四季
+var LUNAR_MONTH = [12]string{
+	"寅", "卯", "辰", "巳", "午", "未",
+	"申", "酉", "戌", "亥", "子", "丑",
+}
+
 // {* 五行字符串，以通常的金木水火土为顺序 }
 // 这里没用五行相生或者相克来排列
 var WU_XING_STR = [5]string{
@@ -402,6 +408,8 @@ type TXiYong struct {
 	DayWuXing     int     // 日干五行
 	Same          int     // 同类
 	Diff          int     // 异类
+	SameList      []int   // 同类
+	DiffList      []int   // 异类
 	WuXingWeight  [5]int  // 五行权值
 	ShiShenWeight [10]int // 十神权值
 }
@@ -516,7 +524,7 @@ func GetYinYangFromNumber(nValue int) string {
 }
 
 var LUNAR_MONTH_STR = [12]string{
-	"一月", "二月", "三月", "四月", "五月", "六月",
+	"正月", "二月", "三月", "四月", "五月", "六月",
 	"七月", "八月", "九月", "十月", "冬月", "腊月"}
 
 func GetLunarMonthFromNumber(nValue int) string {

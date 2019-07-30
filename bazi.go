@@ -66,11 +66,11 @@ func calc(bazi *TBazi, nSex int) {
 	// 计算起运时间
 	DaYun.CalcQiYun(&bazi.DaYun, bazi.PreviousJie, bazi.NextJie, bazi.SolarDate)
 
-	// 计算喜用神
-	bazi.XiYong = SiZhu.CalcXiYong(&bazi.SiZhu)
-
 	// 统计五行
 	bazi.WuXing = SiZhu.StatWuXing(&bazi.SiZhu)
+
+	// 计算喜用神
+	bazi.XiYong = SiZhu.CalcXiYong(bazi.BaziDate.Month, &bazi.SiZhu, &bazi.WuXing)
 
 	// 计算十二长生
 	bazi.DiShi = SiZhu.CalcDiShi(&bazi.SiZhu)
@@ -99,6 +99,14 @@ func GetBazi(nYear, nMonth, nDay, nHour, nMinute, nSecond, nSex int) TBazi {
 	// 转农历
 	var nTimeStamp = Days.Get64TimeStamp(nYear, nMonth, nDay, nHour, nMinute, nSecond)
 	bazi.LunarDate = Lunar.GetDateFrom64TimeStamp(nTimeStamp)
+
+	// 闰月转换
+	leapMonth := Lunar.GetLeapMonth(bazi.SolarDate.Year)
+	if leapMonth > 0 {
+		if (bazi.LunarDate.Month + 1) > leapMonth {
+			bazi.LunarDate.Month = bazi.LunarDate.Month - 1
+		}
+	}
 
 	// 进行计算
 	calc(&bazi, nSex)
@@ -262,7 +270,17 @@ func PrintBazi(bazi *TBazi) {
 		log.Printf("身弱 %d, 同类强度%.2f%%\n", bazi.XiYong.Diff-bazi.XiYong.Same, float64(100*bazi.XiYong.Same)/float64(bazi.XiYong.Diff+bazi.XiYong.Same))
 	}
 
+	// 闰月转换
+	leapMonth := Lunar.GetLeapMonth(bazi.LunarDate.Year)
+	if leapMonth > 0 {
+		log.Println("haha @@@ ", bazi.LunarDate.Month, leapMonth)
+		if (bazi.LunarDate.Month + 1) > leapMonth {
+			bazi.LunarDate.Month = bazi.LunarDate.Month - 1
+		}
+	}
+	log.Println("haha @@@ ", bazi.LunarDate.Month, leapMonth)
 	jijie := int(math.Ceil(float64(bazi.LunarDate.Month)/3)) - 1
+	log.Println("fzz ######### ", bazi.LunarDate.Month, jijie)
 	log.Println("四季五行:", SI_JI_XI_JI_STR[bazi.SiZhu.DayZhu.Gan.WuXing.Value][jijie])
 	log.Println("五行制化:", WU_XING_ZHIHUA_STR[bazi.SiZhu.DayZhu.Gan.WuXing.Value])
 

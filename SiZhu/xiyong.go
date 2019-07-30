@@ -20,6 +20,7 @@ package SiZhu
 
 import (
 	"log"
+	"strings"
 
 	. "github.com/warrially/BaziGo/Common"
 )
@@ -35,6 +36,72 @@ var TIAN_GAN_QIANG_DU_LIST = [10]int{5, 5, 5, 5, 5, 5, 5, 5, 5, 5} // 甲乙丙�
 var DI_ZHI_QIANG_DU_LIST = [36]int{
 	// 子 子 子  丑   丑   丑   寅   寅  寅  卯   卯  卯 辰   辰   辰   巳  巳  巳   午   午  午 未   未   未   申  申  申   酉   酉 酉  戌   戌   戌   亥   亥   亥
 	8, 0, 0, 5, 2, 1, 5, 2, 1, 8, 0, 0, 5, 2, 1, 5, 2, 1, 5, 3, 0, 5, 2, 1, 5, 2, 1, 8, 0, 0, 5, 2, 1, 5, 3, 0}
+
+// 五行旺度表
+// TODO 判断旺61，相45，囚21，休8，死1
+// 春月：木旺、火相、水休、金囚、土死；
+// 夏月：火旺、土相、木休、水囚、金死；
+// 秋月：金旺、水相、土休、火囚、木死；
+// 冬月：水旺、木相、金休、土囚、火死；
+// 四季：土旺、金相、火休、木囚、水死。
+// 这里的四季，是指辰戌丑未四季月最后十八天。春月，是寅卯月，以及辰月的前十二天；夏月，是指巳午月，以及未月的前十二天；秋月，是指申酉月，以及戌月的前十二天；冬月是指亥子月以及丑月的前十二天。春、夏、秋、冬、四季各占72天。
+
+/*
+	　　　　　木　　火　　　土　　　金　　　水
+	　　寅月　旺　　相　　　死　　　囚　　　休
+	　　卯月　旺　　相　　　死　　　囚　　　休
+	　　辰月　余气　休　　　旺　　　相　　　死或相
+	　　巳月　休　　旺　　　相　　　死　　　囚
+	　　午月　休　　旺　　　相　　　死　　　囚
+	　　未月　囚　　余气　　旺　　　死　　　死
+	　　申月　死　　囚　　　休　　　旺　　　相
+	　　酉月　死　　囚　　　休　　　旺　　　相
+	　　戌月　囚　　休或相　旺　　　相或死　死
+	　　亥月　相　　死　　　囚　　　休　　　旺
+	　　子月　相　　死　　　囚　　　休　　　旺
+	　　丑月　囚　　死　　　旺或相　相　　　余气
+
+	　　特殊情况：
+	　　木生于辰月——木不以囚论，而以余气论，因为辰月为春末，木有余气；
+	　　水生于辰月――当命局中水较旺时以相论，反之以死论；
+	　　火生于未月——火不以休论，而以余气论，因为未月为夏末，火还有余热；
+	　　金生于未月——金以死论不以相论，燥土不生金；
+	　　火生于戌月——当燥土党众或原局很干燥时以相论，反之以休论；
+	　　金生于戌月――当燥土党众或原局很干燥时以死论，反之以相论；
+	　　水生于丑月——水不以死论而以余气论，因为丑月为冬末，水还有余气；
+	　　土生于丑月——未戌土生于丑月不以旺论而以相论，辰丑月生于丑月以旺论。
+	　　“旺相休囚死”五行旺度系数：
+	　　旺：　2
+	　　余气：1.6
+	　　相：　1.5
+	　　休：　0.8
+	　　囚：　0.7
+	　　死：　0.5
+*/
+
+var WUXING_WANGDU_LIST = [12][5]string{
+	// 金木水火土
+	{"囚", "旺", "休", "相", "死"},
+	{"囚", "旺", "休", "相", "死"},
+	{"相", "余气", "死,相", "休", "旺"},
+	{"死", "休", "囚", "旺", "相"},
+	{"死", "休", "囚", "旺", "相"},
+	{"死", "囚", "死", "余气", "旺"},
+	{"旺", "死", "相", "囚", "休"},
+	{"旺", "死", "相", "囚", "休"},
+	{"相,死", "囚", "死", "休,相", "旺"},
+	{"休", "相", "旺", "死", "囚"},
+	{"休", "相", "旺", "死", "囚"},
+	{"相", "囚", "余气", "死", "旺,相"},
+}
+var WUXING_WANGDU_VALUE = map[string]int{
+	"旺":  20,
+	"余气": 16,
+	"相":  15,
+	"休":  8,
+	"囚":  7,
+	"死":  5,
+}
 
 // 天干强度表
 var TIAN_GAN_QIANG_DU_LIST2 = [12][10]int{
@@ -70,105 +137,64 @@ var DI_ZHI_QIANG_DU_LIST2 = [12][36]int{
 	{1100, 0, 0, 550, 330, 228, 742, 300, 0, 1060, 0, 0, 550, 318, 220, 700, 0, 342, 1000, 0, 0, 550, 212, 300, 798, 0, 330, 1140, 0, 0, 550, 342, 200, 770, 318, 0}} // 丑月
 
 // 计算喜用神
-func CalcXiYong(pSiZhu *TSiZhu) TXiYong {
+func CalcXiYong(month int, pSiZhu *TSiZhu, pWuXing *TWuXingStat) TXiYong {
 	var xiyong TXiYong
 
 	// 1. 通过四柱计算天干地支强度,以及十神强度
-	var wuxing = [5]int{0, 0, 0, 0, 0}                  // 金木水火土
+	var wuxing = [5]int{0, 0, 0, 0, 0} // 金木水火土
+	var wuxingCount = pWuXing.CangGanResult
 	var shishen = [10]int{0, 0, 0, 0, 0, 0, 0, 0, 0, 0} // 比劫食伤才财杀官卩印
 
 	// 2. 拿到四柱的月支
 	var nMonthZhi = pSiZhu.MonthZhu.Zhi.Value
 	// log.Println("月支是", nMonthZhi, pSiZhu.MonthZhu.Zhi.Str)
 
-	// 3. 根据四柱天干, 换算强度
-	//wuxing[pSiZhu.YearZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[nMonthZhi][pSiZhu.YearZhu.Gan.Value]
-	/*
-		wuxing[pSiZhu.YearZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.YearZhu.Gan.Value]
-		wuxing[pSiZhu.MonthZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.MonthZhu.Gan.Value]
-		wuxing[pSiZhu.DayZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.DayZhu.Gan.Value]
-		wuxing[pSiZhu.HourZhu.Gan.WuXing.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.HourZhu.Gan.Value]
-		// 3.1 根据天干，换算十神强度
-		shishen[pSiZhu.YearZhu.Gan.ShiShen.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.YearZhu.Gan.Value]
-		shishen[pSiZhu.MonthZhu.Gan.ShiShen.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.MonthZhu.Gan.Value]
-		shishen[GetShiShenFromGan(pSiZhu.DayZhu.Gan.Value, pSiZhu.DayZhu.Gan.Value)] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.DayZhu.Gan.Value]
-		shishen[pSiZhu.HourZhu.Gan.ShiShen.Value] += TIAN_GAN_QIANG_DU_LIST[pSiZhu.HourZhu.Gan.Value]
+	// 3. 计算旺度值
+	for wx, count := range wuxingCount {
+		wuxing[wx] = getWangDuValue(month, wx) * count
+	}
+	log.Println("计算完毕天干后的五行权值是:", wuxing)
 
-		log.Println("计算完毕天干后的五行权值是:", wuxing)
-	*/
-	// 3. 根据四柱天干, 换算强度
-	wuxing[pSiZhu.YearZhu.Gan.WuXing.Value] += 10
-	wuxing[pSiZhu.MonthZhu.Gan.WuXing.Value] += 10
-	wuxing[pSiZhu.DayZhu.Gan.WuXing.Value] += 10
-	wuxing[pSiZhu.HourZhu.Gan.WuXing.Value] += 10
-
+	// 4. 根据四柱天干, 换算强度
 	shishen[pSiZhu.YearZhu.Gan.ShiShen.Value] += 10
 	shishen[pSiZhu.MonthZhu.Gan.ShiShen.Value] += 10
 	shishen[GetShiShenFromGan(pSiZhu.DayZhu.Gan.Value, pSiZhu.DayZhu.Gan.Value)] += 10
 	shishen[pSiZhu.HourZhu.Gan.ShiShen.Value] += 10
 
-	log.Println("计算完毕天干后的五行权值是:", wuxing)
-
-	// 4. 根据四柱地支, 换算强度, 计算五行权值，以及十神权值
-	wuxing[pSiZhu.YearZhu.Zhi.WuXing.Value] += 10
-	wuxing[pSiZhu.MonthZhu.Zhi.WuXing.Value] += 10
-	wuxing[pSiZhu.DayZhu.Zhi.WuXing.Value] += 10
-	wuxing[pSiZhu.HourZhu.Zhi.WuXing.Value] += 10
-
+	// 4. 根据四柱地支, 换算强度, 计算十神权值
 	for i := 0; i < 3; i++ {
 		// 年
 		var nCangGan = pSiZhu.YearZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			/*
-				idx := CalcCangGanQiangDuIndex(pSiZhu.YearZhu.Zhi.Value, pSiZhu.YearZhu.Zhi.CangGan[i].Value)
-				//wuxing[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[nMonthZhi-2][pSiZhu.YearZhu.Zhi.Value*3+idx]
-				wuxing[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.YearZhu.Zhi.Value*3+idx]
-				shishen[pSiZhu.YearZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.YearZhu.Zhi.Value*3+idx]
-			*/
-			wuxing[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += 1
+			//wuxing[pSiZhu.YearZhu.Zhi.CangGan[i].WuXing.Value] += 1
 			shishen[pSiZhu.YearZhu.Zhi.CangGan[i].ShiShen.Value] += 1
 		}
 
 		// 月
 		nCangGan = pSiZhu.MonthZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			/*
-				idx := CalcCangGanQiangDuIndex(pSiZhu.MonthZhu.Zhi.Value, pSiZhu.MonthZhu.Zhi.CangGan[i].Value)
-				wuxing[pSiZhu.MonthZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.MonthZhu.Zhi.Value*3+idx] * 2 // 月支能量*2
-				shishen[pSiZhu.MonthZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.MonthZhu.Zhi.Value*3+idx] * 2
-			*/
-			wuxing[pSiZhu.MonthZhu.Zhi.CangGan[i].WuXing.Value] += 1
+			//wuxing[pSiZhu.MonthZhu.Zhi.CangGan[i].WuXing.Value] += 1
 			shishen[pSiZhu.MonthZhu.Zhi.CangGan[i].ShiShen.Value] += 1
 		}
 
 		// 日
 		nCangGan = pSiZhu.DayZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			/*
-				idx := CalcCangGanQiangDuIndex(pSiZhu.DayZhu.Zhi.Value, pSiZhu.DayZhu.Zhi.CangGan[i].Value)
-				wuxing[pSiZhu.DayZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.DayZhu.Zhi.Value*3+idx]
-				shishen[pSiZhu.DayZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.DayZhu.Zhi.Value*3+idx]
-			*/
-			wuxing[pSiZhu.DayZhu.Zhi.CangGan[i].WuXing.Value] += 1
+			//wuxing[pSiZhu.DayZhu.Zhi.CangGan[i].WuXing.Value] += 1
 			shishen[pSiZhu.DayZhu.Zhi.CangGan[i].ShiShen.Value] += 1
 		}
 
 		// 时
 		nCangGan = pSiZhu.HourZhu.Zhi.CangGan[i].Value
 		if nCangGan >= 0 {
-			/*
-				idx := CalcCangGanQiangDuIndex(pSiZhu.HourZhu.Zhi.Value, pSiZhu.HourZhu.Zhi.CangGan[i].Value)
-				wuxing[pSiZhu.HourZhu.Zhi.CangGan[i].WuXing.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.HourZhu.Zhi.Value*3+idx]
-				shishen[pSiZhu.HourZhu.Zhi.CangGan[i].ShiShen.Value] += DI_ZHI_QIANG_DU_LIST[pSiZhu.HourZhu.Zhi.Value*3+idx]
-			*/
-			wuxing[pSiZhu.HourZhu.Zhi.CangGan[i].WuXing.Value] += 1
+			//wuxing[pSiZhu.HourZhu.Zhi.CangGan[i].WuXing.Value] += 1
 			shishen[pSiZhu.HourZhu.Zhi.CangGan[i].ShiShen.Value] += 1
 		}
 	}
 
 	// 5. 根据日干五行, 计算出同类和异类
 	var nDayWuXing = pSiZhu.DayZhu.Gan.WuXing.Value
-	xiyong.Same, xiyong.Diff = CalcWuXingQiangRuo(nDayWuXing, wuxing)
+	xiyong.Same, xiyong.Diff, xiyong.SameList, xiyong.DiffList = CalcWuXingQiangRuo(nDayWuXing, wuxing)
 	// 月支
 	xiyong.MonthZhi = nMonthZhi
 	// 日五行
@@ -182,9 +208,11 @@ func CalcXiYong(pSiZhu *TSiZhu) TXiYong {
 }
 
 // 计算五行强弱
-func CalcWuXingQiangRuo(nDayWuXing int, wuxing [5]int) (int, int) {
+func CalcWuXingQiangRuo(nDayWuXing int, wuxing [5]int) (int, int, []int, []int) {
 	var nSame = 0 // 同类
 	var nDiff = 0 // 异类
+	var aSame = []int{}
+	var aDiff = []int{}
 
 	// 自己
 	nSame += wuxing[nDayWuXing]
@@ -193,18 +221,37 @@ func CalcWuXingQiangRuo(nDayWuXing int, wuxing [5]int) (int, int) {
 	case 0: // 金 同类土
 		nSame += wuxing[4]
 		nDiff += wuxing[1] + wuxing[2] + wuxing[3]
+		aSame = append(aSame, []int{0, 4}...)
+		aDiff = append(aDiff, []int{1, 2, 3}...)
 	case 1: // 木 同类水
 		nSame += wuxing[2]
 		nDiff += wuxing[0] + wuxing[3] + wuxing[4]
+		aSame = append(aSame, []int{1, 2}...)
+		aDiff = append(aDiff, []int{0, 3, 4}...)
 	case 2: // 水 同类金
 		nSame += wuxing[0]
 		nDiff += wuxing[1] + wuxing[3] + wuxing[4]
+		aSame = append(aSame, []int{0, 2}...)
+		aDiff = append(aDiff, []int{1, 3, 4}...)
 	case 3: // 火 同类木
 		nSame += wuxing[1]
 		nDiff += wuxing[0] + wuxing[2] + wuxing[4]
+		aSame = append(aSame, []int{1, 3}...)
+		aDiff = append(aDiff, []int{0, 2, 4}...)
 	case 4: // 土 同类火
 		nSame += wuxing[3]
 		nDiff += wuxing[0] + wuxing[1] + wuxing[2]
+		aSame = append(aSame, []int{4, 3}...)
+		aDiff = append(aDiff, []int{0, 2, 1}...)
 	}
-	return nSame, nDiff
+	return nSame, nDiff, aSame, aDiff
+}
+
+func getWangDuValue(month, wuxing int) int {
+	month -= 1
+	wangdu := WUXING_WANGDU_LIST[month][wuxing]
+	list := strings.Split(wangdu, ",")
+	// TODO 暂时取第一个
+	log.Println("---- ", month, wuxing, list[0])
+	return WUXING_WANGDU_VALUE[list[0]]
 }
