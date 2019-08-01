@@ -219,27 +219,27 @@ func CalcWuXingQiangRuo(nDayWuXing int, wuxing [5]int) (int, int, []int, []int) 
 
 	switch nDayWuXing {
 	case 0: // 金 同类土
-		nSame += wuxing[4]
+		nSame += wuxing[4] + wuxing[0]
 		nDiff += wuxing[1] + wuxing[2] + wuxing[3]
 		aSame = append(aSame, []int{0, 4}...)
 		aDiff = append(aDiff, []int{1, 2, 3}...)
 	case 1: // 木 同类水
-		nSame += wuxing[2]
+		nSame += wuxing[2] + wuxing[1]
 		nDiff += wuxing[0] + wuxing[3] + wuxing[4]
 		aSame = append(aSame, []int{1, 2}...)
 		aDiff = append(aDiff, []int{0, 3, 4}...)
 	case 2: // 水 同类金
-		nSame += wuxing[0]
+		nSame += wuxing[0] + wuxing[2]
 		nDiff += wuxing[1] + wuxing[3] + wuxing[4]
 		aSame = append(aSame, []int{0, 2}...)
 		aDiff = append(aDiff, []int{1, 3, 4}...)
 	case 3: // 火 同类木
-		nSame += wuxing[1]
+		nSame += wuxing[1] + wuxing[3]
 		nDiff += wuxing[0] + wuxing[2] + wuxing[4]
 		aSame = append(aSame, []int{1, 3}...)
 		aDiff = append(aDiff, []int{0, 2, 4}...)
 	case 4: // 土 同类火
-		nSame += wuxing[3]
+		nSame += wuxing[3] + wuxing[4]
 		nDiff += wuxing[0] + wuxing[1] + wuxing[2]
 		aSame = append(aSame, []int{4, 3}...)
 		aDiff = append(aDiff, []int{0, 2, 1}...)
